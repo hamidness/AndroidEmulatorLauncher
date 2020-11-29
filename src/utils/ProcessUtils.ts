@@ -1,0 +1,40 @@
+import { exec } from "child_process";
+import { globalLog } from "./Logger";
+
+export const runCommand = async (
+  command: string,
+  log?: (text: string) => void
+): Promise<undefined> => {
+  globalLog(`Running command: ${command}`);
+  return new Promise((resolve, reject) => {
+    const childProcess = exec(command);
+
+    if (childProcess.stdout) {
+      childProcess.stdout.setEncoding("utf8");
+      childProcess.stdout.on("data", (chunk) => {
+        if (log) {
+          log(chunk.trimEnd() + "\n");
+        }
+        globalLog(chunk.trimEnd());
+      });
+    }
+    if (childProcess.stderr) {
+      childProcess.stderr.setEncoding("utf8");
+      childProcess.stderr.on("data", (chunk) => {
+        if (log) {
+          log(chunk.trimEnd() + "\n");
+        }
+        globalLog(chunk.trimEnd());
+      });
+    }
+
+    childProcess.on("close", (code) => {
+      globalLog(`Exit with error code ${code}`);
+      if (code === 0) {
+        resolve(undefined);
+      } else {
+        reject(Error(`Exit with error code ${code}`));
+      }
+    });
+  });
+};

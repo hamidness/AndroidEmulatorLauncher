@@ -1,0 +1,111 @@
+{
+  "name": "android-emu-launcher",
+  "productName": "android-emu-launcher",
+  "version": "1.0.0",
+  "description": "Manage & Launch Android Virtual Devices",
+  "main": ".webpack/main",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "eslint --ext .ts ."
+  },
+  "keywords": [],
+  "author": {
+    "name": "Hamid Gharehdaghi",
+    "email": "hamidfri@gmail.com"
+  },
+  "license": "MIT",
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "android_emu_launcher"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ],
+      "plugins": [
+        [
+          "@electron-forge/plugin-webpack",
+          {
+            "mainConfig": "./webpack.main.config.js",
+            "renderer": {
+              "config": "./webpack.renderer.config.js",
+              "entryPoints": [
+                {
+                  "html": "./src/index.html",
+                  "js": "./src/renderer.tsx",
+                  "name": "main_window"
+                }
+              ]
+            }
+          }
+        ]
+      ]
+    }
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.54",
+    "@electron-forge/maker-deb": "^6.0.0-beta.54",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.54",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
+    "@electron-forge/maker-zip": "^6.0.0-beta.54",
+    "@electron-forge/plugin-webpack": "6.0.0-beta.54",
+    "@marshallofsound/webpack-asset-relocator-loader": "^0.5.0",
+    "@types/adm-zip": "^0.4.33",
+    "@types/react-router-dom": "^5.1.6",
+    "@typescript-eslint/eslint-plugin": "^4.8.2",
+    "@typescript-eslint/parser": "^4.8.2",
+    "copy-webpack-plugin": "^6.3.2",
+    "css-loader": "^4.2.1",
+    "electron": "11.0.3",
+    "eslint": "^7.14.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "fork-ts-checker-webpack-plugin": "^5.0.14",
+    "node-loader": "^1.0.1",
+    "style-loader": "^1.2.1",
+    "ts-loader": "^8.0.2",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "@mdi/js": "^5.8.55",
+    "@mdi/react": "^1.4.0",
+    "@types/node": "^14.14.9",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/styled-components": "^5.1.4",
+    "adm-zip": "^0.5.0",
+    "electron-dl": "^3.0.2",
+    "electron-is-dev": "^1.2.0",
+    "electron-reload": "^1.5.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "file-system": "^2.2.2",
+    "prettier": "^2.2.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-hot-loader": "^4.13.0",
+    "react-router-dom": "^5.2.0",
+    "rxjs": "^6.6.3",
+    "styled-components": "^5.2.1"
+  }
+}

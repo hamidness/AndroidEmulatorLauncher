@@ -1,0 +1,55 @@
+.log-report-root {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  position: relative;
+}
+
+.log-report-logs {
+  height: 100%;
+  width: 100%;
+  text-align: left;
+  overflow-y: scroll;
+  white-space: pre-wrap;
+  color: #aaa;
+  font-weight: lighter;
+  font-size: 12px;
+  border: #444 solid 1px;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 0px;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.log-report-overlay {
+  width: calc(100% - 20px);
+  position: absolute;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-end;
+  padding: 10px;
+}
+
+.log-report-button {
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+}
+
+.log-report-button:not(:first-child) {
+  margin-top: 10px;
+}
+
+.log-report-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.log-report-button:active {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}

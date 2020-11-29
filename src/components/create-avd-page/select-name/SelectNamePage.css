@@ -1,0 +1,71 @@
+.select-case-root {
+  width: 100%;
+  height: 100%;
+  padding: 10px 10px 0px 10px;
+  display: flex;
+  flex-flow: column-reverse nowrap;
+}
+
+.select-case-bottom-bar {
+  width: 100%;
+  height: 50px;
+  border-top: #444 solid 1px;
+  display: flex;
+  flex-flow: row-reverse nowrap;
+  padding: 10px;
+}
+
+.select-case-button {
+  border-radius: 5px;
+  height: 100%;
+  width: 80px;
+  text-align: center;
+  display: flex;
+  flex-flew: row nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.select-case-button.active {
+  background-color: #86b817;
+  cursor: pointer;
+}
+
+.select-case-button.inactive {
+  background-color: #444;
+}
+
+.select-case-table-body-container {
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.select-case-table-body-container div {
+  flex-flow: column nowrap;
+  justify-content: start;
+  align-items: start;
+}
+
+.select-case-table-body-container div p {
+  padding: 0px;
+  margin: 0px 0px 5px 0px;
+  text-align: left;
+  color: white;
+  font-size: 14px;
+  font-weight: lighter;
+}
+
+.select-case-table-body-container div input {
+  width: 300px;
+  background-color: #444;
+  border: #888 solid 1px;
+  border-radius: 2px;
+  height: 30px;
+  color: #ccc;
+  padding: 10px;
+  font-size: 14px;
+  outline: none;
+}
