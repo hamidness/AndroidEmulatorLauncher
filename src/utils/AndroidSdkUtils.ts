@@ -32,6 +32,7 @@ import {
   writeFileContent,
 } from "./FileUtils";
 import { globalLog } from "./Logger";
+import { downloadFile, ProgressCallback } from "./DownloadUtils";
 
 const env = (): any => process.env;
 export const androidSdkDir = (): string => env().HOME + "/Library/Android/sdk";
@@ -247,32 +248,18 @@ const extractCommandLineTools = async (
 ): Promise<undefined> => {
   globalLog("Extracting command line tools");
   const commandLineToolsDir = `${androidSdkDir()}/cmdline-tools`;
-  return makeDirRecursive(commandLineToolsDir).then(() =>
-    unzipFile(zipFilename, commandLineToolsDir)
-  );
+  return makeDirRecursive(commandLineToolsDir)
+    .then(() => unzipFile(zipFilename, commandLineToolsDir))
+    .then(() => undefined);
 };
 
 const downloadCommandLineTools = (
-  progressCallback: (percent: number) => void
+  progressCallback: ProgressCallback
 ): Promise<string> => {
-  globalLog("Downloading command line tools");
-  return new Promise<string>((resolve) => {
-    const tempPath = (app || electron.remote.app).getPath("temp");
-    const url =
-      "https://dl.google.com/android/repository/commandlinetools-mac-6858069_latest.zip";
-    ipcRenderer.send("download", {
-      url: url,
-      properties: { directory: tempPath },
-    });
-    globalLog("Sending download command: " + url);
-
-    ipcRenderer.on("download-progress", (event, progress) => {
-      progressCallback(Math.round(progress.percent * 100));
-    });
-    ipcRenderer.on("download-complete", (event, file) => {
-      resolve(file);
-    });
-  });
+  return downloadFile(
+    "https://dl.google.com/android/repository/commandlinetools-mac-6858069_latest.zip",
+    progressCallback
+  );
 };
 
 const makeCommandLineToolsExecutable = (): Promise<undefined> => {

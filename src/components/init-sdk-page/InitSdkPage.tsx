@@ -8,10 +8,13 @@ import {
 import CreateProgressPage from "../create-progress/CreateProgressPage";
 import { ipcRenderer } from "electron";
 import { globalLog } from "../../utils/Logger";
+import { installJava, isJavaInstalled } from "../../utils/JavaInstaller";
+import DownloadProgressPage from "../download-progress-page/DownloadProgressPage";
 
 enum SdkInitState {
   STATE_DISPLAY_INIT_MESSAGE,
   STATE_DOWNLOAD_TOOLS,
+  STATE_INSTALL_JAVA,
   STATE_INSTALL_EMULATOR,
   STATE_CONCLUSION_FAILED,
   STATE_CONCLUSION_SUCCEED,
@@ -21,20 +24,41 @@ export default () => {
   const [initState, setInitState] = useState(
     SdkInitState.STATE_DISPLAY_INIT_MESSAGE
   );
-  const [downloadPercent, setDownloadPercent] = useState(0);
+  const [cmdlineDownloadPercent, setCmdlineDownloadPercent] = useState(0);
+  const [javaDownloadPercent, setJavaDownloadPercent] = useState(0);
   const [installEmulatorLogs, setInstallEmulatorLogs] = useState("");
 
-  const handleDownload = () => {
+  const handleDownloadCommandlineTools = () => {
     setInitState(SdkInitState.STATE_DOWNLOAD_TOOLS);
-    installCommandLineTools((percent) => setDownloadPercent(percent)).then(
+    installCommandLineTools((percent) =>
+      setCmdlineDownloadPercent(percent)
+    ).then(
       () => {
-        setInitState(SdkInitState.STATE_INSTALL_EMULATOR);
-        handleInstallEmulator();
+        isJavaInstalled().then(
+          () => {
+            setInitState(SdkInitState.STATE_INSTALL_EMULATOR);
+            handleInstallEmulator();
+          },
+          () => {
+            setInitState(SdkInitState.STATE_INSTALL_JAVA);
+            handleInstallJava();
+          }
+        );
       },
       (reason: any) => {
         globalLog("Failed: " + reason);
         setInitState(SdkInitState.STATE_CONCLUSION_FAILED);
       }
+    );
+  };
+
+  const handleInstallJava = () => {
+    installJava((percent: number) => setJavaDownloadPercent(percent)).then(
+      () => {
+        setInitState(SdkInitState.STATE_INSTALL_EMULATOR);
+        handleInstallEmulator();
+      },
+      () => setInitState(SdkInitState.STATE_CONCLUSION_FAILED)
     );
   };
 
@@ -58,26 +82,31 @@ export default () => {
           Android SDK tools is not installed. Install the SDK tools to start
           using emulators.
         </div>
-        <div className="init-message-button" onClick={handleDownload}>
+        <div
+          className="init-message-button"
+          onClick={handleDownloadCommandlineTools}
+        >
           Install
         </div>
       </div>
     );
   };
 
-  const renderDownloadTools = () => {
+  const renderDownloadCmdlineTools = () => {
     return (
-      <div className="init-download-root">
-        <div className="init-download-title">
-          {downloadPercent < 100 ? downloadPercent + "%" : "Unzipping..."}
-        </div>
-        <div className="init-download-progress-container">
-          <div
-            className="init-download-progress"
-            style={{ width: `${downloadPercent}%` }}
-          />
-        </div>
-      </div>
+      <DownloadProgressPage
+        downloadPercent={cmdlineDownloadPercent}
+        titleAfterComplete="Unzipping..."
+      />
+    );
+  };
+
+  const renderInstallJava = () => {
+    return (
+      <DownloadProgressPage
+        downloadPercent={javaDownloadPercent}
+        titleAfterComplete="Installing..."
+      />
     );
   };
 
@@ -108,7 +137,10 @@ export default () => {
         <div className="init-message-title">
           Ooops! Cannot install Android SDK tools!
         </div>
-        <div className="init-message-button" onClick={handleDownload}>
+        <div
+          className="init-message-button"
+          onClick={handleDownloadCommandlineTools}
+        >
           Retry
         </div>
       </div>
@@ -119,7 +151,9 @@ export default () => {
     if (initState === SdkInitState.STATE_DISPLAY_INIT_MESSAGE) {
       return renderDisplayMessage();
     } else if (initState === SdkInitState.STATE_DOWNLOAD_TOOLS) {
-      return renderDownloadTools();
+      return renderDownloadCmdlineTools();
+    } else if (initState === SdkInitState.STATE_INSTALL_JAVA) {
+      return renderInstallJava();
     } else if (initState === SdkInitState.STATE_INSTALL_EMULATOR) {
       return renderInstallEmulator();
     } else if (initState === SdkInitState.STATE_CONCLUSION_SUCCEED) {

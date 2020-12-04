@@ -1,9 +1,12 @@
 import fs from "fs";
-import AdmZip from "adm-zip";
+import decompress from "decompress";
 import { Observable } from "rxjs";
 import { globalLog } from "./Logger";
 import { runCommand } from "./ProcessUtils";
 import { isWin } from "./Platform";
+import electron, { app } from "electron";
+import rimraf from "rimraf";
+import * as path from "path";
 
 export const fileExists = (filename: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
@@ -32,6 +35,21 @@ export const makeDirRecursive = (dir: string): Promise<undefined> => {
   });
 };
 
+export const removeDirRecursive = (dir: string): Promise<undefined> => {
+  globalLog("Removing dir " + dir);
+  return new Promise<undefined>((resolve, reject) => {
+    rimraf(dir, (error) => {
+      if (error) {
+        globalLog(`Error removing dir ${dir}: ${error}`);
+        reject(error);
+      } else {
+        globalLog(`Removing dir ${dir} succeed`);
+        resolve(undefined);
+      }
+    });
+  });
+};
+
 export const renamePath = (
   currentPath: string,
   newPath: string
@@ -53,20 +71,37 @@ export const renamePath = (
 export const unzipFile = (
   zipFilename: string,
   targetDir: string
-): Promise<undefined> => {
+): Promise<string[]> => {
   globalLog(`Unzipping file ${zipFilename} into ${targetDir}`);
-  return new Promise<undefined>((resolve, reject) => {
-    const admZip = new AdmZip(zipFilename);
-    admZip.extractAllToAsync(targetDir, true, (error) => {
-      if (error) {
-        globalLog(`Error unzipping file: ${error}`);
-        reject(error);
-      } else {
-        globalLog(`Unzipping file succeed`);
-        resolve(undefined);
-      }
-    });
+  return decompress(zipFilename, targetDir).then(
+    (files: decompress.File[]) => {
+      globalLog(`Unzipping file succeed`);
+      const decompressedFiles = findDecompressedRootPaths(targetDir, files);
+      decompressedFiles.forEach((file) => globalLog("Decompressed: " + file));
+      return Promise.resolve(decompressedFiles);
+    },
+    (error) => {
+      globalLog(`Error unzipping file: ${error}`);
+      return Promise.reject(error);
+    }
+  );
+};
+
+const findDecompressedRootPaths = (
+  targetDir: string,
+  files: decompress.File[]
+): string[] => {
+  const pathSet = new Set<string>();
+  files.forEach((file) => {
+    const parts = file.path.split(path.sep);
+    if (parts && parts.length > 0) {
+      pathSet.add(parts[0]);
+    }
   });
+
+  return Array.from(pathSet).map((extractedFile) =>
+    path.resolve(targetDir, extractedFile)
+  );
 };
 
 export const getDirList = (path: string): Observable<string> => {
@@ -114,6 +149,24 @@ export const writeFileContent = (
   });
 };
 
+export const appendFile = (
+  filename: string,
+  content: string
+): Promise<undefined> => {
+  globalLog(`Editing file ${filename}`);
+  return new Promise((resolve, reject) => {
+    fs.appendFile(filename, content, (error) => {
+      if (error) {
+        globalLog(`Error editing file ${error}`);
+        reject(error);
+      } else {
+        globalLog(`Editing file succeed.`);
+        resolve(undefined);
+      }
+    });
+  });
+};
+
 export const makeFilesExecutable = (files: string): Promise<undefined> => {
   globalLog(`Make executable: ${files}`);
   if (!isWin()) {
@@ -121,4 +174,8 @@ export const makeFilesExecutable = (files: string): Promise<undefined> => {
   } else {
     return Promise.resolve(undefined);
   }
+};
+
+export const getTempPath = (): string => {
+  return (app || electron.remote.app).getPath("temp");
 };
