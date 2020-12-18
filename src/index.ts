@@ -39,7 +39,6 @@ const createWindow = (): void => {
     mainWindow.on("closed", () => {
         mainWindow = null;
     });
-    mainWindow.webContents.openDevTools();
 
     registerNewAvdDialogListener();
     registerCloseCreateAvdWindowListener();
