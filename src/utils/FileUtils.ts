@@ -89,7 +89,7 @@ export const unzipFile = (zipFilename: string, targetDir: string): Promise<strin
 const findDecompressedRootPaths = (targetDir: string, files: decompress.File[]): string[] => {
     const pathSet = new Set<string>();
     files.forEach((file) => {
-        const parts = file.path.split(path.sep);
+        const parts = file.path.split(/\\|\//);
         if (parts && parts.length > 0) {
             pathSet.add(parts[0]);
         }
@@ -157,9 +157,14 @@ export const appendFile = (filename: string, content: string): Promise<undefined
 
 export const makeFilesExecutable = (files: string): Promise<undefined> => {
     globalLog(`Make executable: ${files}`);
-    const command = getPlatform().getCommandMakeFileExecutable(files);
-    if (command) {
-        return runCommand(command);
+    const commandFunc = getPlatform().getCommandMakeFileExecutable;
+    if (commandFunc) {
+        const command = commandFunc(files);
+        if (command) {
+            return runCommand(command);
+        } else {
+            return Promise.resolve(undefined);
+        }
     } else {
         return Promise.resolve(undefined);
     }

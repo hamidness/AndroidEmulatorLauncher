@@ -12,7 +12,7 @@ export const setEnvironmentVariable = (name: string, value: string): Promise<und
         const data = getSetEnvVarCommand(name, value) + EOL;
         return appendFile(profileFile, data);
     } else if (isWin()) {
-        return runCommand(`set ${name}="${value}" && setx ${name} "${value}"`);
+        return runCommand(`cmd /c "setx ${name} "${value}""`);
     }
 };
 
@@ -24,7 +24,7 @@ export const addToPathEnvironmentVariable = (dir: string): Promise<undefined> =>
         const data = `export PATH=$PATH:${dir}${EOL}`;
         return appendFile(profileFile, data);
     } else if (isWin()) {
-        return runCommand(`set PATH="%PATH%;${dir}" && setx PATH "%PATH%;${dir}"`);
+        return runCommand(`cmd /c "setx PATH "%PATH%;${dir}""`);
     }
 };
 

@@ -69,7 +69,7 @@ const extractAvdConfigFromContent = (dir: string, configContent: string): AvdCon
     const readApi = (): string => {
         const systemImage = config.getValueOrDefault(AVD_CONFIG_KEY_SYSTEM_IMAGE, "");
         const startIndex = systemImage.indexOf("android-") + 8;
-        return systemImage.substring(startIndex, systemImage.indexOf("/", startIndex));
+        return systemImage.substring(startIndex, systemImage.substring(startIndex).search(/\\|\//) + startIndex);
     };
 
     let id = config.getValueOrDefault(AVD_CONFIG_KEY_ID, "NO_ID");
@@ -184,7 +184,7 @@ const changeAvdConfigs = async (avdName: string, spec: CreateAvdSpec): Promise<u
 };
 
 export const installPackage = (packageName: string, log?: (text: string) => void): Promise<undefined> => {
-    const installPackageCommand = `echo y | ${sdkManagerExecutable()} --install "${packageName}"`;
+    const installPackageCommand = `echo y| ${sdkManagerExecutable()} --sdk_root="${androidSdkDir()}" --install "${packageName}"`;
     return runCommand(installPackageCommand, log);
 };
 

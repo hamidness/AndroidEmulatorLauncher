@@ -66,16 +66,16 @@ const WIN_PLATFORM: Platform = {
         "https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u275-b01/OpenJDK8U-jdk_x64_windows_hotspot_8u275b01.zip",
     sdkRootDir: WIN_SDK_ROOT,
     avdRootDir: path.resolve(HOME_PATH, ".android", "avd"),
-    sdkToolsDir: path.resolve(WIN_SDK_ROOT, "tools"),
-    avdManager: path.resolve(WIN_SDK_ROOT, "tools", "bin", "avdmanager.bat"),
-    sdkManager: path.resolve(WIN_SDK_ROOT, "tools", "bin", "sdkmanager.bat"),
+    sdkToolsDir: path.resolve(WIN_SDK_ROOT, "cmdline-tools", "latest"),
+    avdManager: path.resolve(WIN_SDK_ROOT, "cmdline-tools", "latest", "bin", "avdmanager.bat"),
+    sdkManager: path.resolve(WIN_SDK_ROOT, "cmdline-tools", "latest", "bin", "sdkmanager.bat"),
     emulator: path.resolve(WIN_SDK_ROOT, "emulator", "emulator.exe"),
     jvmTargetPath: "C:\\Program Files\\Java",
-    javaHomeRelativeDirAfterUnzip: "\\",
+    javaHomeRelativeDirAfterUnzip: ".",
 
     getCommandMakeFileExecutable: undefined,
     getCommandSudoMoveDirToDir: (sourceDir: string, targetDir: string) =>
-        `cmd /c "mkdir ${targetDir} & move ${sourceDir} ${targetDir}"`,
+        `cmd /c "mkdir "${targetDir}" & move "${sourceDir}" "${targetDir}""`,
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

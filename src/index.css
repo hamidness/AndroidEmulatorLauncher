@@ -24,3 +24,7 @@ html {
 *, *:before, *:after {
   box-sizing: inherit;
 }
+
+::-webkit-scrollbar {
+  display: none;
+}
